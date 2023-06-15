@@ -1,0 +1,71 @@
+package hieu.com.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import hieu.com.exception.ResourceNotFoundException;
+import hieu.com.model.Student;
+import hieu.com.repository.StudentRepository;
+
+@CrossOrigin(origins = "*", maxAge = 3600)
+@RestController
+@RequestMapping("/api/v1")
+public class StudentController {
+	@Autowired
+	StudentRepository studentRepository;
+	
+	@GetMapping("/student")
+	public List<Student> getStudent() {
+		return studentRepository.findAll();
+	}
+	@GetMapping("/student/{ma_sv}")
+	public ResponseEntity<Student> getStudentByMaSV(@PathVariable("ma_sv") String ma_sv) {
+	    Student student =  studentRepository.findById(ma_sv).orElseThrow(() -> new ResourceNotFoundException("Mã sinh viên không tồn tại:"));
+		return ResponseEntity.ok(student);
+	}
+	@PostMapping("/student")
+	public Student createStudent(@RequestBody Student sinhVien) {
+		 boolean exists = studentRepository.existsById(sinhVien.getMa_sv());
+		    if (exists) {
+		        throw new RuntimeException("Mã sinh viên đã tồn tại: " + sinhVien.getMa_sv());
+		    }
+	    return studentRepository.save(sinhVien);
+	}
+	@PutMapping("/student/{ma_sv}")
+	public ResponseEntity<Student> updateStudent(@PathVariable String ma_sv, @RequestBody Student studentDetails){
+		Student student = studentRepository.findById(ma_sv)
+				.orElseThrow(() -> new ResourceNotFoundException("Không tồn tại mã sinh viên :" + ma_sv));
+		
+		student.setEmail(studentDetails.getEmail());
+		student.setHoten(studentDetails.getHoten());
+		student.setNgaysinh(studentDetails.getNgaysinh());
+		student.setQuequan(studentDetails.getQuequan());
+		student.setSdt(studentDetails.getSdt());
+		Student updateStudent = studentRepository.save(student);
+		
+		return ResponseEntity.ok(updateStudent);
+	}
+	
+	@DeleteMapping("/student/{ma_sv}")
+	public ResponseEntity<Map<String, Boolean>> deleteEmployee(@PathVariable String ma_sv){
+		Student student = studentRepository.findById(ma_sv)
+				.orElseThrow(() -> new ResourceNotFoundException("Không tồn tại mã sinh viên :" + ma_sv));
+		
+		employeeRepository.delete(employee);
+		Map<String, Boolean> response = new HashMap<>();
+		response.put("deleted", Boolean.TRUE);
+		return ResponseEntity.ok(response);
+	}
+}

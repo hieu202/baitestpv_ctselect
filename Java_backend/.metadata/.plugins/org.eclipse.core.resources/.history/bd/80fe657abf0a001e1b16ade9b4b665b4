@@ -1,0 +1,5 @@
+package hieu.com.exception;
+
+public class ResourceNotFoundException {
+
+}

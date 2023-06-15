@@ -1,0 +1,5 @@
+package hieu.com.repository;
+
+public interface StudentRepository {
+
+}

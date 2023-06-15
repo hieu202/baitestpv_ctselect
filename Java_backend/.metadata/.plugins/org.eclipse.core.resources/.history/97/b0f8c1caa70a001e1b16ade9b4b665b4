@@ -1,0 +1,5 @@
+package hieu.com.model;
+
+public class Student {
+
+}

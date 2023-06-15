@@ -1,0 +1,46 @@
+package hieu.com.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import hieu.com.exception.ResourceNotFoundException;
+import hieu.com.model.Student;
+import hieu.com.repository.StudentRepository;
+
+@CrossOrigin(origins = "*", maxAge = 3600)
+@RestController
+@RequestMapping("/api/v1")
+public class StudentController {
+	@Autowired
+	StudentRepository studentRepository;
+	
+	@GetMapping("/student")
+	public List<Student> getStudent() {
+		return studentRepository.findAll();
+	}
+	@GetMapping("/student/{ma_sv}")
+	public ResponseEntity<Student> getStudentByMaSV(@PathVariable("ma_sv") String ma_sv) {
+	    Student student =  studentRepository.findById(ma_sv).orElseThrow(() -> new ResourceNotFoundException("Mã sinh viên không tồn tại:"));
+		return ResponseEntity.ok(student);
+	}
+	@PostMapping("/student")
+	public Student createStudent(@RequestBody Student sinhVien) {
+		 boolean exists = studentRepository.existsById(sinhVien.getMa_sv());
+		    if (exists) {
+		        throw new RuntimeException("Mã sinh viên đã tồn tại: " + sinhVien.getMa_sv());
+		    }
+	    return studentRepository.save(sinhVien);
+	}
+	@PutMapping("/student/{ma_sv}")
+	
+}
